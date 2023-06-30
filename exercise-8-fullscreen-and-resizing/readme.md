@@ -14,3 +14,13 @@ npm run dev
 # Build for production in the dist/ directory
 npm run build
 ```
+
+When a screen resize happen:
+    update size
+    update camera aspect ratio
+    updating camera aspect ratio also needs to update project matrix
+        `camera.updateProjectionMatrix()`
+    update renderer
+
+
+pixelRatio higher than 2 canot bring any visual difference to user
