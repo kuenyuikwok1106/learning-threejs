@@ -10,27 +10,21 @@ const canvas = document.querySelector('canvas.webgl')
 // Scene
 const scene = new THREE.Scene()
 
+// Textures 
+const textureLoader = new THREE.TextureLoader()
+const generatedTexture = textureLoader.load('/zeus-demo.jpeg')
+
 // Object
-const sphereGeometry = new THREE.SphereGeometry(1, 32, 32)
-const geometry = new THREE.BoxGeometry(2, 1, 1)
-const material = new THREE.MeshBasicMaterial({ color: 0xff0000, wireframe: true })
-const sphereMesh = new THREE.Mesh(sphereGeometry, material)
-const mesh = new THREE.Mesh(geometry, material)
-// scene.add(sphereMesh)
-// scene.add(mesh)
-
-const myGeometry = new THREE.BufferGeometry();
-const positionsArray = new Float32Array([
-    0, 0, 0, // First vertex xyz
-    0, 1, 0, // Second vertex xyz
-    1, 0, 0  // Third vertex xyz
-])
-// saying 3 elements form one vertex
-const positionsAttribute = new THREE.BufferAttribute(positionsArray, 3)
-myGeometry.setAttribute('position', positionsAttribute)
-const myMesh = new THREE.Mesh(myGeometry, material)
-scene.add(myMesh)
-
+const sphereGeometry = new THREE.SphereGeometry(100, 32, 32)
+const material = new THREE.MeshBasicMaterial({
+    map: generatedTexture,
+    // color: 0xff0000,
+    side: THREE.BackSide,
+    // wireframe: true,
+})
+const mesh = new THREE.Mesh(sphereGeometry, material)
+sphereGeometry.scale(1, 1, 1)
+scene.add(mesh)
 
 // Sizes
 const sizes = {
@@ -38,29 +32,11 @@ const sizes = {
     height: window.innerHeight
 }
 
-window.addEventListener('resize', () =>
-{
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
-
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
-
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
-
 // Camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.z = 3
+const camera = new THREE.PerspectiveCamera(90, sizes.width / sizes.height, 0.1, 400)
+camera.position.z = -100
+camera.position.y = -50
 scene.add(camera)
-
-// Controls
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
 
 // Renderer
 const renderer = new THREE.WebGLRenderer({
@@ -68,22 +44,19 @@ const renderer = new THREE.WebGLRenderer({
 })
 renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+renderer.render(scene, camera)
 
-// Animate
-const clock = new THREE.Clock()
+// Controls
+const controls = new OrbitControls( camera, canvas );
+controls.enableDamping = true;
 
-const tick = () =>
-{
-    const elapsedTime = clock.getElapsedTime()
-
-    // Update controls
-    controls.update()
-
-    // Render
+// Animation
+function tick () {
+    // mesh.rotation.y += 0.005
+    
+    controls.update();
     renderer.render(scene, camera)
-
-    // Call tick again on the next frame
     window.requestAnimationFrame(tick)
 }
 
-tick()
+tick();
