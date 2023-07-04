@@ -12,19 +12,29 @@ const scene = new THREE.Scene()
 
 // Textures 
 const textureLoader = new THREE.TextureLoader()
-const generatedTexture = textureLoader.load('/zeus-demo.jpeg')
+const map = textureLoader.load('/map.jpg')
+const depthMap = textureLoader.load('/depth-map.jpg')
 
 // Object
 const sphereGeometry = new THREE.SphereGeometry(100, 32, 32)
-const material = new THREE.MeshBasicMaterial({
-    map: generatedTexture,
-    // color: 0xff0000,
+const material = new THREE.MeshStandardMaterial({
+// const material = new THREE.MeshBasicMaterial({
+    map: map,
+    lightMap: depthMap,
+    lightMapIntensity: 0.5,
+    // transparent: true,
+    // // color: 0xff0000,
     side: THREE.BackSide,
     // wireframe: true,
 })
 const mesh = new THREE.Mesh(sphereGeometry, material)
 sphereGeometry.scale(1, 1, 1)
 scene.add(mesh)
+
+const light = new THREE.AmbientLight( 'white' );
+light.position.set( 0, 0, 0 );
+scene.add(light)
+
 
 // Sizes
 const sizes = {
@@ -34,8 +44,7 @@ const sizes = {
 
 // Camera
 const camera = new THREE.PerspectiveCamera(90, sizes.width / sizes.height, 0.1, 400)
-camera.position.z = -100
-camera.position.y = -50
+camera.position.z = 2
 scene.add(camera)
 
 // Renderer
