@@ -1,7 +1,9 @@
 import * as THREE from 'three'
+import * as dat from 'lil-gui'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 
 THREE.ColorManagement.enabled = false
+const gui = new dat.GUI()
 
 /**
  * Base
@@ -21,38 +23,79 @@ const doorHeightTexture = textureLoader.load('/textures/door/height.jpg')
 const doorNormalTexture = textureLoader.load('/textures/door/normal.jpg')
 const doorMetalnessTexture = textureLoader.load('/textures/door/metalness.jpg')
 const doorRoughnessTexture = textureLoader.load('/textures/door/roughness.jpg')
-const matcapTexture = textureLoader.load('/textures/matcaps/1.png')
-const gradientTexture = textureLoader.load('/textures/gradients/3.jpg')
+const matcapTexture = textureLoader.load('/textures/matcaps/3.png')
+const gradientTexture = textureLoader.load('/textures/gradients/5.jpg')
 
 // Meshes
 const basicMaterial = new THREE.MeshBasicMaterial({
     map: doorColorTexture,
-    color: 0xff00ff,
+    // color: 0xff00ff,
     // wireframe: true,
     transparent: true,
-    // alphaMap: doorAlphaTexture,
-    side: THREE.DoubleSide
+    // opacity: 0.5,
+    alphaMap: doorAlphaTexture,
+    side: THREE.DoubleSide,
 });
 const normalMaterial = new THREE.MeshNormalMaterial({
-
+    flatShading: true,
+});
+const matcapMaterial = new THREE.MeshMatcapMaterial({
+    matcap: matcapTexture,
 })
+const lamberMaterial = new THREE.MeshLambertMaterial()
+const phongMaterial = new THREE.MeshPhongMaterial({
+    shininess: 1000,
+    specular: 'blue',
+})
+
+gradientTexture.minFilter = THREE.NearestFilter
+gradientTexture.magFilter = THREE.NearestFilter
+gradientTexture.generateMipmaps = false
+const toonMaterial = new THREE.MeshToonMaterial({
+    gradientMap: gradientTexture,
+})
+
+const standardMaterial = new THREE.MeshStandardMaterial({
+    map: doorColorTexture,
+    aoMap: doorAmbientOcclusionTexture,
+    aoMapIntensity: 1,
+    side: THREE.DoubleSide,
+    displacementMap: doorHeightTexture,
+    metalnessMap: doorMetalnessTexture,
+    roughnessMap: doorRoughnessTexture,
+    normalMap: doorNormalTexture,
+})
+
+gui.add(standardMaterial, 'metalness').min(0).max(1).step(0.0001)
+gui.add(standardMaterial, 'roughness').min(0).max(1).step(0.0001)
 
 const sphere = new THREE.Mesh(
   new THREE.SphereGeometry(0.5,16,16),
-  basicMaterial
+  phongMaterial
 );
 const plane = new THREE.Mesh(
   new THREE.PlaneGeometry(1,1),
-  basicMaterial
+  standardMaterial
 );
 const torus = new THREE.Mesh(
   new THREE.TorusGeometry(0.3, 0.2, 16, 32),
-  basicMaterial
+  toonMaterial
 );
 
 sphere.position.x = - 1.5
 torus.position.x = 1.5
 scene.add(sphere, plane, torus)
+
+/**
+ * Lights
+ */
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
+scene.add(ambientLight);
+const pointLight = new THREE.PointLight(0xffffff, 0.7)
+pointLight.position.x = 2
+pointLight.position.y = 3
+pointLight.position.z = 4
+scene.add(pointLight)
 
 
 /**
@@ -122,7 +165,7 @@ const tick = () =>
     sphere.rotation.x = 0.15 * elapsedTime
     plane.rotation.x = 0.15 * elapsedTime
     torus.rotation.x = 0.15 * elapsedTime
-    camera.lookAt(plane.position)
+    camera.lookAt(torus.position)
 
 
     // Render
