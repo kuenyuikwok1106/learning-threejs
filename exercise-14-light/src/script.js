@@ -21,12 +21,34 @@ const scene = new THREE.Scene()
  */
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
 scene.add(ambientLight)
+gui.add(ambientLight, 'intensity').min(0).max(1).step(0.001).name("ambientLight intensity");
+gui.addColor(ambientLight, 'color').name("ambientLight color");
 
 const pointLight = new THREE.PointLight(0xffffff, 0.5)
 pointLight.position.x = 2
 pointLight.position.y = 3
 pointLight.position.z = 4
 scene.add(pointLight)
+gui.add(pointLight, 'intensity').min(0).max(1).step(0.001).name("pointLight intensity");
+gui.addColor(pointLight, 'color').name("pointLight color");
+
+const directionalLight = new THREE.DirectionalLight(0x00fffc, 0.3)
+directionalLight.position.set(1, 0.25, 0)
+scene.add(directionalLight)
+gui.add(directionalLight, 'intensity').min(0).max(1).step(0.001).name("directionalLight intensity");
+gui.add(directionalLight.position, 'x', 0, 10).name("directionalLight positionX");
+gui.add(directionalLight.position, 'y', 0, 10).name("directionalLight positionY");
+gui.add(directionalLight.position, 'z', 0, 10).name("directionalLight positionZ");
+gui.addColor(directionalLight, 'color').name("directionalLight color");
+
+const hemisphereLight = new THREE.HemisphereLight(0x000000, 0x0000ff, 0.3)
+scene.add(hemisphereLight);
+// gui.addColor(hemisphereLight, 'skyColor').name("hemisphereLight skyColor");
+// gui.addColor(hemisphereLight, 'groundColor').name("hemisphereLight groundColor");
+// gui.addColor(hemisphereLight, 'intensity').name("hemisphereLight intensity");
+
+
+
 
 /**
  * Objects
